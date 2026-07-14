@@ -1,801 +1,778 @@
-Freemans HTML Email Development Framework
+# FGH Promotional Email Build Guide
 
-A comprehensive specification and production toolkit for building responsive, accessible, and client-compatible HTML marketing emails for Freemans.
+This README is a portable reference for building Freemans Grattan Holdings promotional email snippets in future AI or developer sessions.
 
-Overview
+It covers the working method, source-of-truth rules, Adobe Campaign requirements, Scene7 image conventions, brand handling, validation checks, and reusable content blocks needed to code Freemans, Grattan, Curvissa, Bonprix, Lookagain, Kaleidoscope, and related FGH campaign emails in the established FGH email style.
 
-This repository contains the official framework, coding standards, quality assurance checklists, and reusable HTML components required to build marketing emails for Freemans.
+## Quick Start For A New Session
 
-Unlike standard web development, email client HTML must support hundreds of legacy rendering engines (including Microsoft Outlook, Gmail, Apple Mail, Yahoo Mail, Samsung Mail, and others). This framework guarantees absolute visual consistency, accessibility, and high performance across all targeted configurations.
+Before writing HTML, do these in order:
 
-Core Objectives
+1. Read the high-resolution design PNG first.
+2. Parse the XLSM brief completely once.
+3. Locate and read the closest supplied template HTML.
+4. Build only the first requested brand first.
+5. Use the design for visible copy and layout.
+6. Use the workbook for links, product data, promo code data, terms URLs, and brief-provided banner URLs.
+7. Output a clean content snippet only.
+8. Validate every link, image, spacer, width, CTA, and final 35px spacer before handing over.
 
-Pixel-Perfect Rendering: Matching approved artwork exactly across modern and legacy clients.
+Do not start from memory if project template HTML exists. Existing template code is the structural source of truth.
 
-Accessibility First: Native support for screen readers, legible contrasts, and logical hierarchies.
+## Required Inputs
 
-Responsive Frameworks: Clean fluid-to-breakpoint stacking logic for optimal mobile display.
+Campaign folders usually contain:
 
-Cross-Client Compatibility: Bulletproof nesting techniques designed to withstand Microsoft Word-based rendering engines.
+- A high-resolution design PNG, normally one folder above `Email Code/`.
+- An XLSM brief, also normally one folder above `Email Code/`.
+- One or more HTML template files in `HTML_Templates/`, a local template folder, or nearby dated FGH campaign folders.
+- Product or banner asset naming instructions, sometimes visible in the workbook or the design.
 
-High Performance: Optimized structures keeping absolute file sizes lightweight.
+If only an XD file exists, ask the designer or requester for a 2x PNG export before coding.
 
-Golden Rules
+## Source Of Truth Rules
 
-ALWAYS
+Use the design PNG for:
 
-✔ Use nested, table-based layouts (<table role="presentation">) for structure.
+- Visible copy.
+- Hero text.
+- CTA labels.
+- Section divider text.
+- Promo code text visible in the creative.
+- Section order.
+- Whether CTAs sit above or below product blocks.
+- Whether a product section uses 2-up, 3-up, mosaic, larger single, full-width, or outfit-builder layout.
+- Whether per-item CTAs exist.
 
-✔ Inline every single CSS style directly onto the structural elements.
+Use the XLSM workbook for:
 
-✔ Code using a responsive, mobile-first or fluid-hybrid outlook.
+- Destination URLs.
+- Hero links.
+- Under-hero category CTA links.
+- Product rows.
+- Product order and grid-position values such as `N`.
+- Section CTA links.
+- Banner image URLs.
+- Promo code data.
+- Terms and conditions URL.
+- Brand-specific URLs.
 
-✔ Provide meaningful alternative (alt) text for all key images.
+Use template HTML for:
 
-✔ Include a hidden preheader directly after the opening <body> tag.
+- Table nesting.
+- Column widths.
+- CTA structure.
+- Typography.
+- Classes.
+- Spacers.
+- Existing comments and naming patterns.
+- Dark-mode class usage.
 
-✔ Optimise and compress every image before reference.
+If the design and workbook disagree on brand, promo code, section order, or CTA placement, stop and report the mismatch.
 
-✔ Test builds thoroughly across MS Outlook, Gmail, and Apple Mail.
+## Build Order
 
-✔ Keep code block structures modular and reusable.
+For Freemans and Grattan pairings:
 
-✔ Ensure calls-to-action (CTAs) are fully clickable over their entire visual surface.
+1. Build Freemans first.
+2. Wait for the designer, requester, or reviewer to confirm.
+3. Build Grattan after approval.
 
-✔ Prioritise live HTML text over embedded-image copy wherever layout permits.
+Grattan usually reuses Freemans product image IDs, but must use Grattan sheet destination URLs. Do not derive Grattan product URLs by editing Freemans URLs.
 
-✔ Maintain clean, human-readable structural code with clear logical indentations.
+Grattan banner image URLs must come directly from the Grattan brief sheet. Do not derive them by changing the Freemans banner filename.
 
-NEVER
+## Output Format
 
-✘ Use CSS Grid layouts.
+Return a clean Adobe Campaign content snippet only.
 
-✘ Use Flexbox logic (display: flex).
+Do not include:
 
-✘ Depend on absolute or relative positioning (position: absolute, position: relative).
+- `<!DOCTYPE>`
+- `<html>`
+- `<head>`
+- `<body>`
+- ACR wrappers
+- `<script>`
+- `<style>`
 
-✘ Include JavaScript.
+Start with the first content `<table>` and end with the final closing table. Every email must end with a 35px spacer.
 
-✘ Reference external CSS style sheets.
+## Adobe Campaign Link And Image Rules
 
-✘ Use custom web fonts unless explicitly brand-approved and accompanied by safe fallbacks.
+Every `<a>` tag must include:
 
-✘ Rely on CSS variables (var(--variable-name)).
+```html
+href="#"
+target="_blank"
+data-nl-type="externalLink"
+data-nl-lnkep-perso-attr-href="[DESTINATION_URL]"
+```
 
-✘ Use unsupported CSS selectors or properties.
+Common full link shape:
 
-✘ Build structural column or grid layouts using <div> elements.
+```html
+<a href="#" id="LinkTrackingName" target="_blank" style="margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:0px;" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[DESTINATION_URL]">
+```
 
-✘ Bake primary copy or action calls directly inside image assets without a live alternative.
+Every `<img>` tag must include:
 
-Supported Email Clients
+```html
+alt=""
+data-nl-imgep-perso-attr-alt="[ALT TEXT]"
+height="auto"
+```
 
-Target support standards must be fully optimized for:
+Use meaningful alt text in `data-nl-imgep-perso-attr-alt`. The normal `alt` attribute may match the same copy if the supplied template does that.
 
-Outlook (Windows legacy and modern engines)
+Text-link CTAs styled black in light mode must include the relevant dark-mode class, usually `class="copy"`, so existing template CSS can turn them white in dark mode.
 
-Outlook (Mac)
+## Scene7 Asset Rules
 
-Outlook Mobile (iOS & Android)
+Scene7 URL pattern:
 
-Gmail (Desktop web app)
+```text
+https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID]?&wid=[WIDTH]
+```
 
-Gmail App (iOS & Android)
+Common image ID pattern:
 
-Apple Mail (macOS & iOS)
+```text
+BAU_FY[YEAR]_[BRAND]_[DATE]_[CAMPAIGN]_[SECTION]
+```
 
-Yahoo Mail (Web & App)
-
-Samsung Mail
-
-AOL Mail
-
-Email Structure
-
-Every HTML build must strictly adhere to the following block layout order:
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- Meta tags for character sets, viewports, and client detection -->
-  <!-- CSS Styles (Munging & baseline mobile overrides) -->
-</head>
-<body>
-  <!-- Hidden Preheader Wrapper -->
-  <!-- Outer Centered Wrapper Table (100% width) -->
-    <!-- Main Email Container Table (640px max-width) -->
-      <!-- Brand Header Section -->
-      <!-- Category Navigation Block -->
-      <!-- Main Content Modules (Heros, Banners, Grids) -->
-      <!-- Footer / Legal Info / Unsubscribe Link -->
-  <!-- Tracking Pixels -->
-</body>
-</html>
-
-
-Layout and Sizing Standards
-
-Desktop Standard Width: $640\text{px}$ maximum. (Acceptable variations range between $600\text{px}$ and $640\text{px}$ based on specific design requests).
-
-Mobile Standard Width: $100\%$ fluid.
-
-Margins and Padding Spacing System: Spacing increments must strictly align to the approved brand modular scale of $8, 16, 24, 32, 40, 48, 64\text{px}$. Avoid arbitrary margin or padding values.
-
-HTML & CSS Layout Principles
-
-Table Nesting Philosophy:
-
-Wrapper Table (100% width, viewport background color)
-↓
-Container Table (640px fixed width, white background, centered)
-↓
-Section Table (100% width, modular wrapper)
-↓
-Module Table (Specific content layouts: grids, heros, banners)
-↓
-Individual Cell (Content: text, image, links with inline styling)
-
-
-Inline CSS Styling Example:
-Every structural text block, cell, and link must carry its styles inline. Global styles cannot be relied upon due to client scrubbing.
-
-<td style="padding: 24px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 24px; color: #222222;">
-  Live content goes here...
-</td>
-
-
-Typography Standards
-
-Primary Font Stack: Arial, Helvetica, sans-serif. Use fallbacks gracefully.
-
-Size Hierarchy:
-
-Heading: $32\text{px}$ (Line-height: $38\text{px}$ - $120\%$)
-
-Subheading: $24\text{px}$ (Line-height: $30\text{px}$ - $125\%$)
-
-Body Copy: $16\text{px}$ (Line-height: $24\text{px}$ - $150\%$)
-
-Small Copy: $14\text{px}$ (Line-height: $20\text{px}$ - $140\%$)
-
-Legal / T&Cs: $12\text{px}$ (Line-height: $16\text{px}$ - $133\%$)
-
-Colors
-
-Never hardcode custom color values. Always maps elements strictly to the approved design system palette:
-
-Primary / Core Text: #222222
-
-Secondary / Editorial Copy: #444444
-
-Brand Highlight Background: #f4f1ed
-
-Primary CTA / Dark Backgrounds: #000000
-
-Primary CTA Text / Spacing Backgrounds: #ffffff
-
-Divider Lines / Borders: #dddddd
-
-USP / Accent Backgrounds: #f2f2f2
-
-Image Specifications & Export Rules
-
-Inline Styles: Every image must explicitly carry these styles to prevent layout breakage across Outlook, Gmail, and Apple Mail:
-
-style="display: block; width: 100%; max-width: {intended_width}px; height: auto; border: 0;"
-
-
-Export Formats: PNG, JPG, or WebP.
-
-Retina Resolution: Export assets at exactly $2\times$ their intended rendering display dimensions (e.g., $1280\text{px}$ width for a $640\text{px}$ hero banner display). Set the HTML physical width attribute to the $1\times$ desktop scale.
-
-Compression Target: Every individual image asset should remain under $200\text{KB}$ where possible to minimize loading lag.
-
-Accessibility Best Practices
-
-Alternative Text: Provide detailed, readable alt text representing the context or call to action on the image. Avoid tags like "Hero Banner" or "Image 1".
-
-Decorative Assets: Set empty alt="" and add role="presentation" to purely decorative separators, backgrounds, or spacers.
-
-Semantic Markup: Ensure structural tags and reading orders run strictly logical.
-
-Contrast Standards: Ensure text colors satisfy readable contrast limits against their target cell backgrounds.
-
-Quality Assurance Checklist
-
-Before finalizing or deploying any generated HTML email package, visually and structurally verify the following:
-
-[ ] Asset Retrieval: All referenced image sources (src) route to live, verified URLs.
-
-[ ] Accessibility Compliance: Descriptive alt text is explicitly provided on all descriptive images.
-
-[ ] Destination Links: Every link redirects safely to its correct target destination with tracking metrics cleanly appended.
-
-[ ] Responsive Flow: The email flows gracefully across standard mobile widths ($320\text{px}$ to $480\text{px}$) and columns stack properly.
-
-[ ] Desktop Layout: Layout remains locked at a crisp, centered $640\text{px}$ scale.
-
-[ ] Legacy Client Rendering: Verify outlook conditional wrappers (<!--[if mso]>) compile cleanly.
-
-[ ] No Raw Placeholders: Ensure no trace of double brackets {{...}} or default example URLs remain.
-
-[ ] Dark Mode Usability: Brand assets, logos, and separators preserve legibility across reversed interfaces.
-
-[ ] File Size Constraint: The total structural HTML file size is kept under $100\text{KB}$ to prevent Gmail clipping.
-
-AI Implementation Rules & Instructions
-
-When compiling a new email campaign from a supplied brief, artwork, and design asset:
-
-Strict Modular Design: Formulate the email layout using ONLY the approved reusable fragments documented below.
-
-No Custom Frameworks: Never introduce custom structural code, nested CSS frameworks, external classes, or responsive hacks outside this framework.
-
-Strict HTML Standard: Maintain nesting patterns (Table ➔ TD ➔ Content) and enforce inline styling on every single content node.
-
-Outlook & Gmail Prioritized: Always guarantee formatting stability under Outlook (using VML for buttons where applicable) and Gmail (relying strictly on inlined, clean styling classes).
-
-Live Content Preservation: Use live HTML copy blocks wherever possible. Never drop live headings or copy fields into raw static image exports.
-
-AI Code Review Checklist
-
-Ensure the final produced HTML successfully answers:
-
-[ ] Are all elements formatted strictly using nested tables?
-
-[ ] Is every single style attribute declared directly inline?
-
-[ ] Are structural responsive classes (class="stack-column") preserved?
-
-[ ] Are Outlook specific VML structures correctly matched to their parent anchors?
-
-[ ] Is there absolute zero use of CSS Grid, Flexbox, or absolute positions?
-
-[ ] Are image width properties written cleanly in physical HTML attributes?
-
-[ ] Are responsive viewport configurations declared clearly?
-
-Brief and Asset Matching Process
-
-Use this process to convert the supplied brief, artwork, copy, images and links into the reusable HTML email fragments in this repository.
-
-1. Read the Full Brief
-
-Before selecting a fragment or writing HTML, identify:
-
-Required module order
-
-Supplied heading and body copy
-
-CTA wording
-
-Destination URLs
-
-Image filenames
-
-Desktop and mobile variants
-
-Background colours
-
-Text alignment
-
-Legal or offer wording
-
-Required spacing
-
-Do not invent missing copy, links, prices, discount codes, expiry dates or legal wording. Use clear placeholders where information has not been supplied:
-{{HERO_IMAGE}}, {{HERO_URL}}, {{HERO_HEADING}}, {{HERO_COPY}}, {{HERO_CTA}}, {{OFFER_CODE}}, {{LEGAL_COPY}}
-
-2. Create a Module Map
-
-Match each section of the brief to one of the existing reusable fragments.
 Example:
 
-Hidden Preheader
+```text
+BAU_FY26_FRE_190326_NEWSZN_20FD_HERO
+```
 
-Category Navigation
+Conventions:
 
-Full-Width Hero Image
+- Hero assets end `_HERO`.
+- Product assets use `_1`, `_2`, `_3`, and so on.
+- Brief-provided banners may have existing Scene7 IDs and URLs. Use the brief URL directly.
+- Freemans uses FRE image IDs.
+- Grattan product sections usually reuse FRE image IDs.
+- Grattan URLs come from the Grattan workbook sheet.
 
-Hero with Live Copy and CTA
+Standard widths:
 
-Two-Column Image Layout
+| Section | Scene7 `wid=` | Display width |
+| --- | ---: | ---: |
+| Hero | 900 | 600 |
+| Full-width banner | 900 or 1200, depending on template | 600 |
+| 2-up product | 445 | 297 |
+| 3-up product | 294 | 196 |
+| Larger single product | 780 | 544 |
+| Outfit main image | 597 | 398 |
+| Outfit small product | 294 | 196 |
 
-Editorial Copy Block
+## Spacer Rules
 
-Offer Banner
+| Use | Spacer height |
+| --- | ---: |
+| Between sections | 35px |
+| Between copy and images | 20px |
+| Between section divider and following copy | 10px |
+| Between top banner and hero | 10px |
+| End of every email | 35px |
 
-USP Strip
+Product image gaps:
 
-Divider
+- 2-up row: `297 + 6 + 297 = 600`.
+- 3-up row: `196 + 6 + 196 + 6 + 196 = 600`.
+- Mixed mosaic rows may use a non-6px gap only when exact image maths requires it.
 
-Footer
+For mixed mosaic sections with one large image beside two stacked smaller images, calculate widths and vertical stack gap together so the large image height matches the two small image heights plus the gap. The total row must still equal 600px.
 
-Only use modules required by the brief. Do not add extra sections unless instructed.
+Example accepted maths for 600x834 source assets:
 
-3. Select the Correct Fragment
+```text
+397 + 7 + 196 = 600
+196 + 7 + 196 = 399
+```
 
-Use the fragment that best matches the supplied design:
+## Pricing Rules
 
-One full-width linked image $\rightarrow$ Full-Width Hero Image
+TPR email pricing:
 
-Image followed by heading, copy and CTA $\rightarrow$ Hero with Live Copy and CTA
+```html
+<strong>£NOW </strong><s>£WAS</s>
+```
 
-Two equal images beside each other $\rightarrow$ Two-Column Image Layout
+Sale email pricing:
 
-Image beside live text $\rightarrow$ Two-Column Image and Copy Layout
+```html
+<strong><span style="color:#ca0a00;">£NOW </span></strong><s>£WAS</s>
+```
 
-Two products beside each other $\rightarrow$ Two-Column Product Grid
+Price cells below images are always `text-align:left`.
 
-Three products beside each other $\rightarrow$ Three-Column Product Grid
+## Promo Code And Offer Strip Rules
 
-Centered heading, paragraph and text link $\rightarrow$ Full-Width Editorial Copy Block
+If the brief says `XXXX` for a promo code but the hero image shows a real code, use the code shown in the hero and mention the discrepancy.
 
-Short promotional message on a solid background $\rightarrow$ Offer Banner
+When an offer code or terms strip sits directly below the hero, use the established wrapped hero offer-code pattern:
 
-Horizontal category links $\rightarrow$ Category Navigation
+1. Outer `bgcolor="#000000"` table.
+2. Hero image first.
+3. 10px spacer.
+4. Centered 500px `Use code <strong>CODE</strong>` row at 20px.
+5. 10px spacer.
+6. Centered 500px terms row at 10px/16px.
 
-Three service messages $\rightarrow$ USP Strip
+Do not invent a separate banner structure for this.
 
-Horizontal separating line $\rightarrow$ Divider
+When a coded top offer banner is needed, use the supplied KAL/Freemans banner-with-code table pattern exactly and update only:
 
-Controlled empty vertical space $\rightarrow$ Vertical Spacer
+- Offer amount.
+- Promo code.
+- Terms wording.
+- Date.
 
-Do not recreate a module with custom HTML when an existing fragment already provides the required structure.
+Do not add extra CTA text such as `Shop Now` unless it appears in the supplied pattern or design.
 
-4. Match Images to the Correct Module
+## Workbook Parsing Guidance
 
-Match each supplied image to the section described in the brief. Check:
+Parse the XLSM once per campaign unless the designer, requester, or campaign owner provides an updated workbook.
 
-Visible image content
+Use Python `zipfile` and XML to read:
 
-Filename
-
-Dimensions
-
-Position in the approved design
-
-Associated copy
-
-Associated URL
-
-The approved design and brief take priority over unclear filenames. Every image must retain its original aspect ratio. Always apply standard dynamic baseline styling:
-
-style="display:block; width:100%; max-width:640px; height:auto; border:0;"
-
-
-Do not stretch an image by setting conflicting width and height values.
-
-5. Match Image Width to the Fragment
-
-Use image dimensions that suit the selected module:
-
-Full-width module $\rightarrow$ Maximum displayed width: 640px
-
-Two-column module $\rightarrow$ Maximum displayed width: approximately 320px per image
-
-Three-column module $\rightarrow$ Maximum displayed width: approximately 201px per image
-
-6. Use Live Text Where the Fragment Provides It
-
-When the selected fragment contains HTML headings, paragraphs, prices or CTAs, use the approved copy as live text.
-Do not replace live text with an image unless the supplied artwork already contains the approved typography as part of the image. Do not duplicate the same wording in both the image and the live HTML unless the approved design requires it.
-
-7. Match Links to the Correct Elements
-
-Every linked image and CTA must use the URL supplied for that section. The following elements should normally share the same destination:
-
-Hero image $\rightarrow$ Hero landing-page URL
-
-Hero CTA $\rightarrow$ Hero landing-page URL
-
-Category image $\rightarrow$ Relevant category URL
-
-Category CTA $\rightarrow$ Relevant category URL
-
-Product image $\rightarrow$ Product detail URL
-
-Product name or product CTA $\rightarrow$ Product detail URL
-
-Do not use one generic URL for every section unless instructed.
-
-8. Match Copy to the Correct Image
-
-The copy must correspond with the visual content. For example, a bedding image must map strictly to bedding headers and URLs. Do not attach copy to an image based only on file order; verify the image content before assigning parameters.
-
-9. Set Meaningful Alt Text
-
-Use alt text that describes the destination or purpose of the image.
-
-Good: alt="Shop new-season dresses at Freemans"
-
-Avoid: alt="Hero image" or alt="Banner 01"
-
-For decorative images: alt="" role="presentation"
-
-Do not repeat a nearby heading word-for-word unless the image itself is also the main linked message.
-
-10. Apply the Supplied Styling
-
-Match the approved design by updating only the relevant inline values within the fragment (e.g., background-color, padding, text-align). Do not replace the core table structure, inline CSS conventions, or responsive classes.
-
-11. Preserve Responsive Classes
-
-Fragments using columns must retain the supplied responsive classes (class="stack-column"). The structural mobile layout styles depend directly on them. Use utility classes like mobile-padding, mobile-center, mobile-hide, or mobile-heading safely when the responsive layout dictates it.
-
-12. Confirm Mobile Order
-
-Columns stack in natural layout source HTML order (Left Column $\rightarrow$ Right Column). Arrange the HTML in the strict linear hierarchy you want them to stack on mobile devices. Do not rely on Flexbox, CSS Grid, or absolute positioning to fix order layout shifts.
-
-13. Use the Correct Button Fragment
-
-Use the standard table button for normal CTA requirements. Use the Outlook-compatible bulletproof button when a fixed button appearance is required in desktop Outlook. Keep the VML fallback URL and standard anchor href URLs perfectly synchronized.
-
-14. Use Spacers and Dividers Deliberately
-
-Use the Vertical Spacer fragment only when the approved design requires fixed vertical spacing between modules. Always change all three vertical metrics synchronously (height="32" style="height:32px; line-height:32px;"). Update line color or structural weights cleanly on Dividers.
-
-15. Handle Missing Information
-
-Use named placeholders instead of guessing. Do not publish the final email while placeholders remain unresolved. Search the final HTML output for any trace of raw {{ brackets or standard base setup data like example.com or £39.99 before finalizing.
-
-16. Verify Every Fragment
-
-Before completing the email, systematically check each module against the brief's parameters for correct structural alignment, responsive styling preservation, and data integrity.
-
-Reusable Fragments
-
-Base Responsive Mobile CSS
-
-Include this in the <head> of the master layout template.
-
-<style>
-  body,
-  table,
-  td,
-  a {
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-  }
-
-  table,
-  td {
-    mso-table-lspace: 0pt;
-    mso-table-rspace: 0pt;
-  }
-
-  img {
-    -ms-interpolation-mode: bicubic;
-  }
-
-  table {
-    border-collapse: collapse !important;
-  }
-
-  body {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-  }
-
-  @media only screen and (max-width: 640px) {
-    .email-container {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-
-    .stack-column {
-      display: block !important;
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-
-    .stack-column img {
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-    }
-
-    .mobile-padding {
-      padding-left: 20px !important;
-      padding-right: 20px !important;
-    }
-
-    .mobile-center {
-      text-align: center !important;
-    }
-
-    .mobile-full-width {
-      width: 100% !important;
-    }
-
-    .mobile-hide {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-      overflow: hidden !important;
-    }
-
-    .mobile-heading {
-      font-size: 26px !important;
-      line-height: 32px !important;
-    }
-
-    .mobile-body {
-      font-size: 16px !important;
-      line-height: 24px !important;
-    }
-  }
-</style>
-
-
-Hidden Preheader
-
-<!-- PREHEADER -->
-<div style="display: none; max-height: 0; max-width: 0; overflow: hidden; opacity: 0; color: transparent; font-size: 1px; line-height: 1px; mso-hide: all;">
-  Discover the latest styles, offers and home updates from Freemans.
-</div>
-
-<div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-  &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
-</div>
-<!-- /PREHEADER -->
-
-
-Category Navigation
-
-<!-- CATEGORY NAVIGATION -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff;">
-  <tr>
-    <td align="center" style="padding: 14px 8px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 20px;">
-      <a href="[https://www.freemans.com/womens](https://www.freemans.com/womens)" target="_blank" style="display: inline-block; padding: 6px 10px; color: #222222; font-weight: bold; text-decoration: none;">Womenswear</a>
-      <a href="[https://www.freemans.com/mens](https://www.freemans.com/mens)" target="_blank" style="display: inline-block; padding: 6px 10px; color: #222222; font-weight: bold; text-decoration: none;">Menswear</a>
-      <a href="[https://www.freemans.com/home](https://www.freemans.com/home)" target="_blank" style="display: inline-block; padding: 6px 10px; color: #222222; font-weight: bold; text-decoration: none;">Home</a>
-      <a href="[https://www.freemans.com/electricals](https://www.freemans.com/electricals)" target="_blank" style="display: inline-block; padding: 6px 10px; color: #222222; font-weight: bold; text-decoration: none;">Electricals</a>
-    </td>
-  </tr>
+- Workbook sheet names.
+- Shared strings.
+- Cell values.
+- FRE sheet data.
+- GRA sheet data.
+- Any other brand sheet required for the campaign.
+
+Extract all relevant data in one pass:
+
+- Hero URL.
+- Under-hero CTA labels and URLs.
+- Product rows.
+- Product order.
+- `N` or grid-position values.
+- Section CTA URLs.
+- Banner image URLs.
+- Promo code.
+- Terms URL.
+
+Suggested extraction approach:
+
+```python
+from pathlib import Path
+from zipfile import ZipFile
+import xml.etree.ElementTree as ET
+
+XLSM = Path("Campaign Brief.xlsm")
+NS = {
+    "main": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+    "rel": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+}
+
+def text_of(node):
+    return "".join(t.text or "" for t in node.findall(".//main:t", NS))
+
+with ZipFile(XLSM) as zf:
+    shared = []
+    if "xl/sharedStrings.xml" in zf.namelist():
+        root = ET.fromstring(zf.read("xl/sharedStrings.xml"))
+        shared = [text_of(si) for si in root.findall("main:si", NS)]
+
+    workbook = ET.fromstring(zf.read("xl/workbook.xml"))
+    rels = ET.fromstring(zf.read("xl/_rels/workbook.xml.rels"))
+    rel_map = {rel.attrib["Id"]: rel.attrib["Target"] for rel in rels}
+
+    for sheet in workbook.findall(".//main:sheet", NS):
+        name = sheet.attrib["name"]
+        rid = sheet.attrib["{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"]
+        target = rel_map[rid]
+        sheet_xml = "xl/" + target.lstrip("/")
+        ws = ET.fromstring(zf.read(sheet_xml))
+        # Walk rows/cells here and resolve shared-string cells via `shared`.
+        print(name)
+```
+
+The exact parser can vary, but the important rule is: do the full extraction once, keep the data available, and do not repeatedly dip back into the workbook by hand.
+
+## File Naming
+
+Use the campaign naming pattern:
+
+```text
+BAU_FY[YEAR]_[FRE/GRA]_[DATE]_[CAMPAIGN].html
+```
+
+Examples:
+
+```text
+BAU_FY26_FRE_190326_NEWSZN.html
+BAU_FY26_GRA_190326_NEWSZN.html
+```
+
+## Stop Conditions
+
+Stop and ask the designer, requester, or campaign owner for clarification if:
+
+- The high-resolution PNG is missing.
+- Only an XD file exists and no 2x PNG export is available.
+- The workbook lacks the expected brand sheets.
+- The design and workbook disagree on a critical item.
+- No local or nearby template can be found for the requested structure.
+- A required URL is missing.
+- A required banner URL is missing from the brand-specific sheet.
+
+## Validation Checklist
+
+Before delivery, check:
+
+- Output is a snippet only.
+- No `html`, `head`, `body`, `script`, or `style` wrappers.
+- First element is the first content table.
+- Final element is followed by a 35px spacer.
+- Every `<a>` has Adobe Campaign external-link attributes.
+- Every `<img>` has `alt`, `data-nl-imgep-perso-attr-alt`, and `height="auto"`.
+- All image URLs use the right Scene7 ID and width.
+- Freemans links are from FRE data.
+- Grattan links are from GRA data.
+- Grattan product image IDs still use the shared FRE product assets where expected.
+- CTA labels match the design.
+- Section divider copy matches the design.
+- Promo code matches the design when the brief uses a placeholder.
+- Product order follows the design and workbook grid positions.
+- No per-item CTAs were added unless the design shows them.
+- 2-up widths total 600.
+- 3-up widths total 600.
+- Spacers match the house spacing rules.
+- Pricing format matches TPR or Sale mode.
+- Black text-link CTAs include dark-mode class handling where needed.
+
+## Content Blocks
+
+Use project templates first. Use these blocks only when no supplied block exists, or to validate a generated section against the known pattern.
+
+### 20px Spacer
+
+```html
+<table width="100%" height="20" class="full" border="0" cellpadding="0" cellspacing="0" style="line-height:20px;">
+  <tbody><tr><td style="mso-line-height-rule:exactly;line-height:20px;">&nbsp;</td></tr></tbody>
 </table>
-<!-- /CATEGORY NAVIGATION -->
+```
 
+### 35px Spacer
 
-Full-Width Hero Image
-
-<!-- HERO IMAGE -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td align="center">
-      <a href="[https://www.freemans.com/](https://www.freemans.com/)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/hero.jpg](https://example.com/images/hero.jpg)" width="640" alt="Discover the latest Freemans collection" style="display: block; width: 100%; max-width: 640px; height: auto; border: 0;">
-      </a>
-    </td>
-  </tr>
+```html
+<table width="100%" height="35" class="full" border="0" cellpadding="0" cellspacing="0" style="line-height:35px;">
+  <tbody><tr><td style="mso-line-height-rule:exactly;line-height:35px;">&nbsp;</td></tr></tbody>
 </table>
-<!-- /HERO IMAGE -->
+```
 
+### Hero
 
-Hero with Live Copy and CTA
-
-<!-- HERO COPY -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f1ed;">
-  <tr>
-    <td align="center" style="padding: 32px 24px 40px; font-family: Arial, Helvetica, sans-serif;">
-      <h1 style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 32px; line-height: 38px; font-weight: bold; color: #222222;">New season, new favourites</h1>
-      <p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 24px; color: #444444;">Refresh your wardrobe with the latest styles from Freemans.</p>
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-        <tr>
-          <td align="center" bgcolor="#000000" style="border-radius: 0;">
-            <a href="[https://www.freemans.com/](https://www.freemans.com/)" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 20px; font-weight: bold; color: #ffffff; text-decoration: none;">Shop now</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
+```html
+<!-- HERO -->
+<table width="100%" style="min-width:100%;" class="full" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="top">
+        <a href="#" id="HeroLink" target="_blank" style="margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:0px;" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[HERO_URL]">
+          <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_HERO]?&wid=900" width="600" height="auto" class="full" border="0" style="display:block;text-align:center;font-size:25px;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" alt="[ALT]" data-nl-imgep-perso-attr-alt="[ALT]">
+        </a>
+      </td>
+    </tr>
+  </tbody>
 </table>
-<!-- /HERO COPY -->
+<!-- /HERO -->
+```
 
+### Body Copy
 
-Offer Banner
-
-<!-- OFFER BANNER -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #222222;">
-  <tr>
-    <td align="center" style="padding: 20px 24px; font-family: Arial, Helvetica, sans-serif;">
-      <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 18px; line-height: 24px; font-weight: bold; color: #ffffff;">
-        20% off selected styles with code <span style="white-space: nowrap;">STYLE20</span>
-      </p>
-    </td>
-  </tr>
+```html
+<!-- BODY COPY -->
+<table width="100%" border="0" align="center" valign="top" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="20" align="center" valign="top">&nbsp;</td>
+      <td class="copy" width="560" align="left" valign="top" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:20px;color:#000000;font-weight:normal;text-align:left;">[COPY]</td>
+      <td width="20" align="center" valign="top">&nbsp;</td>
+    </tr>
+  </tbody>
 </table>
-<!-- /OFFER BANNER -->
+<!-- /BODY COPY -->
+```
 
+### Standalone CTA Button
 
-Outlook-Compatible Bulletproof Button
-
-<!-- BULLETPROOF CTA -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
-  <tr>
-    <td align="center">
-      <!--[if mso]>
-      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="[https://www.freemans.com/](https://www.freemans.com/)" style="height: 48px; v-text-anchor: middle; width: 180px;" arcsize="0%" strokecolor="#000000" fillcolor="#000000">
-        <w:anchorlock/>
-        <center style="color: #ffffff; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">Shop now</center>
-      </v:roundrect>
-      <![endif]-->
-      <!--[if !mso]><!-->
-      <a href="[https://www.freemans.com/](https://www.freemans.com/)" target="_blank" style="display: inline-block; min-width: 132px; padding: 14px 24px; background-color: #000000; border: 1px solid #000000; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 18px; font-weight: bold; color: #ffffff; text-align: center; text-decoration: none;">Shop now</a>
-      <!--<![endif]-->
-    </td>
-  </tr>
+```html
+<!-- CTA - [LABEL] -->
+<table width="600" class="full" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="160" class="displaynone-small" align="center" valign="middle">&nbsp;</td>
+      <td width="280" class="full-small" align="center" valign="middle" bgcolor="#ffffff" style="padding:0px;color:#000000;border:#000000 solid 1px;border-radius:5px;">
+        <a href="#" id="[LINK_ID]" class="sbs-cta" style="font-family:Arial,sans-serif;display:block;font-weight:bold;font-size:14px;line-height:14px;text-decoration:none;color:#000000;mso-line-height-rule:exactly;text-transform:none;margin-top:0px;margin-bottom:0px;padding:1px 0;width:100%;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL]">&nbsp;<br>[LABEL]<br>&nbsp;</a>
+      </td>
+      <td width="160" class="displaynone-small" align="center" valign="middle">&nbsp;</td>
+    </tr>
+  </tbody>
 </table>
-<!-- /BULLETPROOF CTA -->
+<!-- /CTA - [LABEL] -->
+```
 
+### Section Divider
 
-Two-Column Image Layout
-
-<!-- TWO-COLUMN IMAGE LAYOUT -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td class="stack-column" width="50%" valign="top" style="width: 50%;">
-      <a href="[https://www.freemans.com/category-one](https://www.freemans.com/category-one)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/category-one.jpg](https://example.com/images/category-one.jpg)" width="320" alt="Shop category one" style="display: block; width: 100%; max-width: 320px; height: auto; border: 0;">
-      </a>
-    </td>
-    <td class="stack-column" width="50%" valign="top" style="width: 50%;">
-      <a href="[https://www.freemans.com/category-two](https://www.freemans.com/category-two)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/category-two.jpg](https://example.com/images/category-two.jpg)" width="320" alt="Shop category two" style="display: block; width: 100%; max-width: 320px; height: auto; border: 0;">
-      </a>
-    </td>
-  </tr>
+```html
+<!-- SECTION DIVIDER -->
+<table width="100%" class="full" border="0" align="left" valign="top" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="20" align="left" valign="top">&nbsp;</td>
+      <td class="divider" width="560" align="left" valign="middle" style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:23px;color:#000000;font-weight:normal;text-align:left;"><strong>[DIVIDER TEXT]</strong></td>
+      <td width="20" align="left" valign="top">&nbsp;</td>
+    </tr>
+  </tbody>
 </table>
-<!-- /TWO-COLUMN IMAGE LAYOUT -->
+<!-- /SECTION DIVIDER -->
+```
 
+### 2-Up Product Images
 
-Two-Column Image and Copy Layout
+`<a>` goes directly inside `<td width="297">`. Do not add an inner table per image unless a project template already uses one.
 
-<!-- IMAGE AND COPY SPLIT -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td class="stack-column" width="50%" valign="middle" style="width: 50%;">
-      <img src="[https://example.com/images/editorial.jpg](https://example.com/images/editorial.jpg)" width="320" alt="Seasonal fashion from Freemans" style="display: block; width: 100%; max-width: 320px; height: auto; border: 0;">
-    </td>
-    <td class="stack-column" width="50%" valign="middle" style="width: 50%; padding: 32px; font-family: Arial, Helvetica, sans-serif; background-color: #f4f1ed;">
-      <h2 style="margin: 0 0 12px; font-family: Arial, Helvetica, sans-serif; font-size: 24px; line-height: 30px; font-weight: bold; color: #222222;">Style for every day</h2>
-      <p style="margin: 0 0 20px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 24px; color: #444444;">Easy-to-wear pieces designed to fit effortlessly into your wardrobe.</p>
-      <a href="[https://www.freemans.com/](https://www.freemans.com/)" target="_blank" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 20px; font-weight: bold; color: #222222; text-decoration: underline;">Shop the collection</a>
-    </td>
-  </tr>
+```html
+<!-- 2-UP: [LABEL] -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="middle">
+        <table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td width="297" align="center" valign="middle">
+                <a href="#" id="[LINK_ID_1]" style="display:block;color:rgb(0, 0, 0);" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_1]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_1]?&wid=445" width="297" height="auto" class="full" border="0" alt="[ALT_1]" style="display:block;text-align:center;font-size:25px;font-weight:normal;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" data-nl-imgep-perso-attr-alt="[ALT_1]">
+                </a>
+              </td>
+              <td width="6" align="center" valign="middle">&nbsp;</td>
+              <td width="297" align="center" valign="middle">
+                <a href="#" id="[LINK_ID_2]" style="display:block;color:rgb(0, 0, 0);" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_2]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_2]?&wid=445" width="297" height="auto" class="full" border="0" alt="[ALT_2]" style="display:block;text-align:center;font-size:25px;font-weight:normal;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" data-nl-imgep-perso-attr-alt="[ALT_2]">
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
 </table>
-<!-- /IMAGE AND COPY SPLIT -->
+<!-- /2-UP: [LABEL] -->
+```
 
+### 3-Up Product Images
 
-Two-Column Product Grid
+`<a>` goes directly inside `<td width="196">`. Do not add an inner table per image unless a project template already uses one.
 
-<!-- TWO-COLUMN PRODUCT GRID -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td class="stack-column" width="50%" valign="top" style="width: 50%; padding: 0 8px 24px 0;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-        <tr>
-          <td align="center">
-            <a href="[https://www.freemans.com/product-one](https://www.freemans.com/product-one)" target="_blank" style="text-decoration: none;">
-              <img src="[https://example.com/images/product-one.jpg](https://example.com/images/product-one.jpg)" width="304" alt="Product one" style="display: block; width: 100%; max-width: 304px; height: auto; border: 0;">
+```html
+<!-- 3-UP: [LABEL] -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="middle">
+        <table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td width="196" align="center" valign="middle">
+                <a href="#" id="[LINK_ID_1]" style="display:block;color:rgb(0, 0, 0);" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_1]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_1]?&wid=294" width="196" height="auto" class="full" border="0" alt="[ALT_1]" style="display:block;text-align:center;font-size:25px;font-weight:normal;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" data-nl-imgep-perso-attr-alt="[ALT_1]">
+                </a>
+              </td>
+              <td width="6" align="center" valign="middle">&nbsp;</td>
+              <td width="196" align="center" valign="middle">
+                <a href="#" id="[LINK_ID_2]" style="display:block;color:rgb(0, 0, 0);" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_2]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_2]?&wid=294" width="196" height="auto" class="full" border="0" alt="[ALT_2]" style="display:block;text-align:center;font-size:25px;font-weight:normal;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" data-nl-imgep-perso-attr-alt="[ALT_2]">
+                </a>
+              </td>
+              <td width="6" align="center" valign="middle">&nbsp;</td>
+              <td width="196" align="center" valign="middle">
+                <a href="#" id="[LINK_ID_3]" style="display:block;color:rgb(0, 0, 0);" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_3]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_3]?&wid=294" width="196" height="auto" class="full" border="0" alt="[ALT_3]" style="display:block;text-align:center;font-size:25px;font-weight:normal;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" data-nl-imgep-perso-attr-alt="[ALT_3]">
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- /3-UP: [LABEL] -->
+```
+
+### 2x2 CTA Grid
+
+Use percentage widths for this block. Do not convert to fixed pixel columns.
+
+```html
+<!-- 2x2 CTA GRID -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="1%" align="center" valign="middle">&nbsp;</td>
+      <td width="47%" align="center" valign="middle">
+        <table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody><tr>
+            <td class="cta" width="100%" align="center" valign="middle" bgcolor="#ffffff" style="padding:0px;color:#000000;border:#000000 solid 1px;border-radius:5px;">
+              <a href="#" id="[LINK_ID_1]" class="sbs-cta" style="font-family:Arial,sans-serif;display:block;font-weight:bold;font-size:14px;line-height:14px;text-decoration:none;color:#000000;mso-line-height-rule:exactly;text-transform:none;margin-top:0px;margin-bottom:0px;padding:1px 0;width:100%;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_1]">&nbsp;<br>[LABEL_1]<br>&nbsp;</a>
+            </td>
+          </tr></tbody>
+        </table>
+      </td>
+      <td width="2%" align="center" valign="middle">&nbsp;</td>
+      <td width="47%" align="center" valign="middle">
+        <table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody><tr>
+            <td class="cta" width="100%" align="center" valign="middle" bgcolor="#ffffff" style="padding:0px;color:#000000;border:#000000 solid 1px;border-radius:5px;">
+              <a href="#" id="[LINK_ID_2]" class="sbs-cta" style="font-family:Arial,sans-serif;display:block;font-weight:bold;font-size:14px;line-height:14px;text-decoration:none;color:#000000;mso-line-height-rule:exactly;text-transform:none;margin-top:0px;margin-bottom:0px;padding:1px 0;width:100%;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL_2]">&nbsp;<br>[LABEL_2]<br>&nbsp;</a>
+            </td>
+          </tr></tbody>
+        </table>
+      </td>
+      <td width="1%" align="center" valign="middle">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+<table width="100%" height="10" class="full" border="0" cellpadding="0" cellspacing="0" style="line-height:10px;">
+  <tbody><tr><td style="mso-line-height-rule:exactly;line-height:10px;">&nbsp;</td></tr></tbody>
+</table>
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="1%" align="center" valign="middle">&nbsp;</td>
+      <td width="47%" align="center" valign="middle">[CTA 3 TABLE]</td>
+      <td width="2%" align="center" valign="middle">&nbsp;</td>
+      <td width="47%" align="center" valign="middle">[CTA 4 TABLE]</td>
+      <td width="1%" align="center" valign="middle">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+<!-- /2x2 CTA GRID -->
+```
+
+For CTA 3 and CTA 4, repeat the same inner CTA table shape used for CTA 1 and CTA 2, replacing the link IDs, labels, and URLs.
+
+### Full-Width Editorial Banner
+
+Use for brief-provided Scene7 URLs.
+
+```html
+<!-- [BANNER NAME] EDITORIAL BANNER -->
+<table width="100%" style="min-width:100%;" class="full" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="top">
+        <a href="#" id="[LINK_ID]" target="_blank" style="margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:0px;" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL]">
+          <img src="[SCENE7_URL_FROM_BRIEF]?wid=900" width="600" height="auto" class="full" border="0" style="display:block;text-align:center;font-size:25px;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" alt="[ALT]" data-nl-imgep-perso-attr-alt="[ALT]">
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- /[BANNER NAME] EDITORIAL BANNER -->
+```
+
+### Larger Single Product
+
+Use for 85% width centered Template 3 style.
+
+```html
+<!-- LARGER IMAGE: [LABEL] -->
+<table width="100%" style="max-width:85%;" class="full" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="top">
+        <a href="#" id="[LINK_ID]" target="_blank" style="margin-top:0px;margin-bottom:0px;padding-top:0px;padding-bottom:0px;" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL]">
+          <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID]?&wid=780" width="544" height="auto" class="full" border="0" style="display:block;text-align:center;font-size:25px;letter-spacing:1px;line-height:28px;font-family:helvetica,arial,sans-serif;color:#000000;" alt="[ALT]" data-nl-imgep-perso-attr-alt="[ALT]">
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- /LARGER IMAGE: [LABEL] -->
+```
+
+### Full-Width Single Image
+
+Use for H&G style full-width image sections.
+
+```html
+<!-- FULL-WIDTH IMAGE: [LABEL] -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="100%" class="full" align="center" valign="middle">
+        <table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <td width="600" align="center" valign="middle">
+                <a href="#" id="[LINK_ID]" style="display:block;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[URL]">
+                  <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID]?&wid=1200" width="600" height="auto" class="full" border="0" alt="[ALT]" style="display:block;" data-nl-imgep-perso-attr-alt="[ALT]">
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- /FULL-WIDTH IMAGE: [LABEL] -->
+```
+
+### Outfit Builder
+
+Odd-numbered outfits usually use main image left. Even-numbered outfits usually use main image right.
+
+Main image left:
+
+```html
+<!-- OUTFIT [N] -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="401" align="center" valign="middle" rowspan="3">
+        <table class="full" width="401" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody><tr><td width="100%" class="full" align="center" valign="middle">
+            <a href="#" id="Outfit[N]MainLink" style="display:block;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[MAIN_URL]">
+              <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_MAIN]?&wid=597" width="398" height="auto" class="full" border="0" alt="[MAIN_ALT]" style="margin:0;padding:0;border:none;display:block;" data-nl-imgep-perso-attr-alt="[MAIN_ALT]" title="[MAIN_ALT]">
             </a>
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding: 16px 12px 0; font-family: Arial, Helvetica, sans-serif;">
-            <p style="margin: 0 0 6px; font-size: 16px; line-height: 22px; font-weight: bold; color: #222222;">Product name</p>
-            <p style="margin: 0 0 14px; font-size: 16px; line-height: 22px; color: #222222;">£39.99</p>
-            <a href="[https://www.freemans.com/product-one](https://www.freemans.com/product-one)" target="_blank" style="font-size: 15px; line-height: 20px; font-weight: bold; color: #222222; text-decoration: underline;">Shop now</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-    <td class="stack-column" width="50%" valign="top" style="width: 50%; padding: 0 0 24px 8px;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-        <tr>
-          <td align="center">
-            <a href="[https://www.freemans.com/product-two](https://www.freemans.com/product-two)" target="_blank" style="text-decoration: none;">
-              <img src="[https://example.com/images/product-two.jpg](https://example.com/images/product-two.jpg)" width="304" alt="Product two" style="display: block; width: 100%; max-width: 304px; height: auto; border: 0;">
+          </td></tr></tbody>
+        </table>
+      </td>
+      <td width="6" align="center" valign="middle" style="width:6px;border-collapse:collapse;">&nbsp;</td>
+      <td width="196" align="center" valign="middle">[SMALL PRODUCT 1]</td>
+    </tr>
+    <tr>
+      <td height="6" style="font-size:6px;line-height:6px;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="6" align="center" valign="middle" style="width:6px;">&nbsp;</td>
+      <td width="196" align="center" valign="middle">[SMALL PRODUCT 2]</td>
+    </tr>
+    <tr>
+      <td height="6" style="font-size:6px;line-height:6px;">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+<!-- /OUTFIT [N] -->
+```
+
+Main image right:
+
+```html
+<!-- OUTFIT [N] -->
+<table class="full" width="100%" align="center" border="0" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td width="196" align="center" valign="middle">[SMALL PRODUCT 1]</td>
+      <td width="6" align="center" valign="middle" style="width:6px;border-collapse:collapse;">&nbsp;</td>
+      <td width="402" align="center" valign="middle" rowspan="3">
+        <table class="full" width="402" align="center" border="0" cellspacing="0" cellpadding="0">
+          <tbody><tr><td width="100%" class="full" align="center" valign="middle">
+            <a href="#" id="Outfit[N]MainLink" style="display:block;" target="_blank" data-nl-type="externalLink" data-nl-lnkep-perso-attr-href="[MAIN_URL]">
+              <img src="https://s7ondemand4.scene7.com/is/image/OttoUK/[IMAGE_ID_MAIN]?&wid=597" width="398" height="auto" class="full" border="0" alt="[MAIN_ALT]" style="margin:0;padding:0;border:none;display:block;" data-nl-imgep-perso-attr-alt="[MAIN_ALT]" title="[MAIN_ALT]">
             </a>
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding: 16px 12px 0; font-family: Arial, Helvetica, sans-serif;">
-            <p style="margin: 0 0 6px; font-size: 16px; line-height: 22px; font-weight: bold; color: #222222;">Product name</p>
-            <p style="margin: 0 0 14px; font-size: 16px; line-height: 22px; color: #222222;">£49.99</p>
-            <a href="[https://www.freemans.com/product-two](https://www.freemans.com/product-two)" target="_blank" style="font-size: 15px; line-height: 20px; font-weight: bold; color: #222222; text-decoration: underline;">Shop now</a>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
+          </td></tr></tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td height="6" style="font-size:6px;line-height:6px;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="196" align="center" valign="middle">[SMALL PRODUCT 2]</td>
+      <td width="6" align="center" valign="middle" style="width:6px;">&nbsp;</td>
+    </tr>
+  </tbody>
 </table>
-<!-- /TWO-COLUMN PRODUCT GRID -->
+<!-- /OUTFIT [N] -->
+```
 
+Use the same 196px small product inner table shape as the full snippet or local template expects. Keep the odd/even width differences: `401` on main-left, `402` on main-right.
 
-Three-Column Product Grid
+### Top Offer Banners
 
-<!-- THREE-COLUMN PRODUCT GRID -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td class="stack-column" width="33.33%" valign="top" style="width: 33.33%; padding: 0 6px;">
-      <a href="[https://www.freemans.com/product-one](https://www.freemans.com/product-one)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/product-one.jpg](https://example.com/images/product-one.jpg)" width="201" alt="Product one" style="display: block; width: 100%; max-width: 201px; height: auto; border: 0;">
-      </a>
-      <p style="margin: 12px 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; font-weight: bold; color: #222222; text-align: center;">Product one</p>
-      <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; color: #222222; text-align: center;">£29.99</p>
-    </td>
-    <td class="stack-column" width="33.33%" valign="top" style="width: 33.33%; padding: 0 6px;">
-      <a href="[https://www.freemans.com/product-two](https://www.freemans.com/product-two)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/product-two.jpg](https://example.com/images/product-two.jpg)" width="201" alt="Product two" style="display: block; width: 100%; max-width: 201px; height: auto; border: 0;">
-      </a>
-      <p style="margin: 12px 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; font-weight: bold; color: #222222; text-align: center;">Product two</p>
-      <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; color: #222222; text-align: center;">£34.99</p>
-    </td>
-    <td class="stack-column" width="33.33%" valign="top" style="width: 33.33%; padding: 0 6px;">
-      <a href="[https://www.freemans.com/product-three](https://www.freemans.com/product-three)" target="_blank" style="text-decoration: none;">
-        <img src="[https://example.com/images/product-three.jpg](https://example.com/images/product-three.jpg)" width="201" alt="Product three" style="display: block; width: 100%; max-width: 201px; height: auto; border: 0;">
-      </a>
-      <p style="margin: 12px 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; font-weight: bold; color: #222222; text-align: center;">Product three</p>
-      <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 21px; color: #222222; text-align: center;">£44.99</p>
-    </td>
-  </tr>
+Place a top banner as the first element before the hero. Add a 10px spacer between banner and hero.
+
+Hurry, offer ends midnight:
+
+```html
+<table width="100%" class="offerbanner" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0" bgcolor="#000000" style="line-height:34px;">
+  <tbody><tr>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+    <td width="510" class="offertext" align="center" valign="middle" bgcolor="#000000" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#ffffff;font-weight:bold;text-align:center;text-transform:uppercase;">Hurry! <span class="offertext" style="font-weight:normal;">offer ends midni‌ght</span></td>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+  </tr></tbody>
 </table>
-<!-- /THREE-COLUMN PRODUCT GRID -->
+```
 
+VIP Preview:
 
-Full-Width Editorial Copy Block
-
-<!-- EDITORIAL COPY BLOCK -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff;">
-  <tr>
-    <td align="center" style="padding: 40px 32px; font-family: Arial, Helvetica, sans-serif;">
-      <h2 style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 28px; line-height: 34px; font-weight: bold; color: #222222;">Find your new-season look</h2>
-      <p style="margin: 0 auto 24px; max-width: 520px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 24px; color: #444444;">Explore easy layers, standout prints and everyday favourites designed to make getting dressed feel effortless.</p>
-      <a href="[https://www.freemans.com/](https://www.freemans.com/)" target="_blank" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 20px; font-weight: bold; color: #222222; text-decoration: underline;">Discover more</a>
-    </td>
-  </tr>
+```html
+<table width="100%" class="offerbanner" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0" bgcolor="#000000" style="line-height:34px;">
+  <tbody><tr>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+    <td width="510" class="offertext" align="center" valign="middle" bgcolor="#000000" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#ffffff;font-weight:bold;text-align:center;text-transform:uppercase;">VIP Preview <span class="offertext" style="font-weight:normal;">| Be the first to shop!</span></td>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+  </tr></tbody>
 </table>
-<!-- /EDITORIAL COPY BLOCK -->
+```
 
+Flash Offer, 24hrs only:
 
-USP Strip
-
-<!-- USP STRIP -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f2f2f2;">
-  <tr>
-    <td class="stack-column" width="33.33%" align="center" valign="top" style="width: 33.33%; padding: 20px 12px; font-family: Arial, Helvetica, sans-serif;">
-      <p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: bold; color: #222222;">Flexible ways to pay</p>
-    </td>
-    <td class="stack-column" width="33.33%" align="center" valign="top" style="width: 33.33%; padding: 20px 12px; font-family: Arial, Helvetica, sans-serif;">
-      <p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: bold; color: #222222;">Easy returns</p>
-    </td>
-    <td class="stack-column" width="33.33%" align="center" valign="top" style="width: 33.33%; padding: 20px 12px; font-family: Arial, Helvetica, sans-serif;">
-      <p style="margin: 0; font-size: 14px; line-height: 20px; font-weight: bold; color: #222222;">Shop trusted brands</p>
-    </td>
-  </tr>
+```html
+<table width="100%" class="offerbanner" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0" bgcolor="#000000" style="line-height:34px;">
+  <tbody><tr>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+    <td width="510" class="offertext" align="center" valign="middle" bgcolor="#000000" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#ffffff;font-weight:bold;text-align:center;text-transform:uppercase;"><span class="offertext" style="font-weight:normal;">Flash Offer |</span> 2‌4hrs only</td>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+  </tr></tbody>
 </table>
-<!-- /USP STRIP -->
+```
 
+Flash Offer, 48hrs only:
 
-Divider
-
-<!-- DIVIDER -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td style="height: 1px; font-size: 1px; line-height: 1px; background-color: #dddddd;">&nbsp;</td>
-  </tr>
+```html
+<table width="100%" class="offerbanner" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0" bgcolor="#000000" style="line-height:34px;">
+  <tbody><tr>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+    <td width="510" class="offertext" align="center" valign="middle" bgcolor="#000000" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#ffffff;font-weight:bold;text-align:center;text-transform:uppercase;"><span class="offertext" style="font-weight:normal;">Flash Offer | </span>4‌8hrs only</td>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+  </tr></tbody>
 </table>
-<!-- /DIVIDER -->
+```
 
+VIP Email Exclusive:
 
-Vertical Spacer
-
-<!-- SPACER -->
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tr>
-    <td height="24" style="height: 24px; font-size: 1px; line-height: 24px;">&nbsp;</td>
-  </tr>
+```html
+<table width="100%" class="offerbanner" border="0" align="center" valign="middle" cellpadding="0" cellspacing="0" bgcolor="#000000" style="line-height:34px;">
+  <tbody><tr>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+    <td width="510" class="offertext" align="center" valign="middle" bgcolor="#000000" style="font-family:Arial, Helvetica, sans-serif;font-size:13px;line-height:20px;color:#ffffff;font-weight:normal;text-align:center;text-transform:uppercase;">Vip email exclusive</td>
+    <td width="45" align="center" valign="top">&nbsp;</td>
+  </tr></tbody>
 </table>
-<!-- /SPACER -->
+```
+
+## Final Handoff Format
+
+When handing over coded email work:
+
+- State which brand was built.
+- State the output filename.
+- Mention any design vs workbook discrepancies.
+- Mention whether tests or validation were run.
+- For Freemans and Grattan paired work, wait for confirmation after Freemans before producing Grattan.
+
+Keep the final message concise, but include blockers or risks clearly.
